@@ -60,7 +60,7 @@ Class _Struct {
     ,PSSIZE_T:=A_PtrSize,PSTR:=A_PtrSize,PTBYTE:=A_PtrSize,PTCHAR:=A_PtrSize,PTSTR:=A_PtrSize,PUCHAR:=A_PtrSize,PUHALF_PTR:=A_PtrSize,PUINT:=A_PtrSize
     ,PUINT_PTR:=A_PtrSize,PUINT32:=A_PtrSize,PUINT64:=A_PtrSize,PULONG:=A_PtrSize,PULONGLONG:=A_PtrSize,PULONG_PTR:=A_PtrSize,PULONG32:=A_PtrSize
     ,PULONG64:=A_PtrSize,PUSHORT:=A_PtrSize,PVOID:=A_PtrSize,PWCHAR:=A_PtrSize,PWORD:=A_PtrSize,PWSTR:=A_PtrSize,SC_HANDLE:=A_PtrSize
-    ,SC_LOCK:=A_PtrSize,SERVICE_STATUS_HANDLE:=A_PtrSize,SIZE_T:=A_PtrSize,UINT_PTR:=A_PtrSize,ULONG_PTR:=A_PtrSize,ATOM:=2,LANGID:=2,WCHAR:=2,WORD:=2
+    ,SC_LOCK:=A_PtrSize,SERVICE_STATUS_HANDLE:=A_PtrSize,SIZE_T:=A_PtrSize,UINT_PTR:=A_PtrSize,ULONG_PTR:=A_PtrSize,ATOM:=2,LANGID:=2,WCHAR:=2,WORD:=2,USAGE:=2
 	; Data Types
   static _PTR:="PTR",_UPTR:="UPTR",_SHORT:="Short",_USHORT:="UShort",_INT:="Int",_UINT:="UInt"
     ,_INT64:="Int64",_UINT64:="UInt64",_DOUBLE:="Double",_FLOAT:="Float",_CHAR:="Char",_UCHAR:="UChar"
@@ -83,7 +83,7 @@ Class _Struct {
     ,_PTBYTE:="UPTR",_PTCHAR:="UPTR",_PTSTR:="UPTR",_PUCHAR:="UPTR",_PUHALF_PTR:="UPTR",_PUINT:="UPTR",_PUINT_PTR:="UPTR",_PUINT32:="UPTR"
     ,_PUINT64:="UPTR",_PULONG:="UPTR",_PULONGLONG:="UPTR",_PULONG_PTR:="UPTR",_PULONG32:="UPTR",_PULONG64:="UPTR",_PUSHORT:="UPTR"
     ,_PVOID:="UPTR",_PWCHAR:="UPTR",_PWORD:="UPTR",_PWSTR:="UPTR",_SC_HANDLE:="UPTR",_SC_LOCK:="UPTR",_SERVICE_STATUS_HANDLE:="UPTR"
-    ,_SIZE_T:="UPTR",_UINT_PTR:="UPTR",_ULONG_PTR:="UPTR",_ATOM:="Ushort",_LANGID:="Ushort",_WCHAR:="Ushort",_WORD:="UShort"
+  static _SIZE_T:="UPTR",_UINT_PTR:="UPTR",_ULONG_PTR:="UPTR",_ATOM:="Ushort",_LANGID:="Ushort",_WCHAR:="Ushort",_WORD:="UShort",_USAGE:="UShort"
     
   ; Following is used internally only to simplify setting field helpers
   ; the corresponding key can be set to invalid type (for string integer and vice versa) to set default if necessary, e.g. ___InitField(N,"")
@@ -128,9 +128,9 @@ Class _Struct {
   __NEW(_TYPE_,_pointer_=0,_init_=0){
     static _base_:={__GET:_Struct.___GET,__SET:_Struct.___SET,__SETPTR:_Struct.___SETPTR,__Clone:_Struct.___Clone,__NEW:_Struct.___NEW
           ,IsPointer:_Struct.IsPointer,Offset:_Struct.Offset,Type:_Struct.Type,AHKType:_Struct.AHKType,Encoding:_Struct.Encoding
-          ,Capacity:_Struct.Capacity,Alloc:_Struct.Alloc,Size:_Struct.Size,SizeT:_Struct.SizeT}
+          ,Capacity:_Struct.Capacity,Alloc:_Struct.Alloc,Size:_Struct.Size,SizeT:_Struct.SizeT,Print:_Struct.Print}
 		local _,_ArrType_,_ArrName_:="",_ArrSize_,_align_total_,_defobj_,_IsPtr_,_key_,_LF_,_LF_BKP_,_match_,_offset_:=""
-					,_struct_,_StructSize_,_total_union_size_,_union_,_union_size_,_value_
+			,_struct_,_StructSize_,_total_union_size_,_union_,_union_size_,_value_,_mod_,_max_size_,_in_struct_,_struct_align_
 		
 		If (RegExMatch(_TYPE_,"^[\w\d\._]+$") && !_Struct.HasKey(_TYPE_)){ ; structures name was supplied, resolve to global var and run again
       If InStr(_TYPE_,"."){ ;check for object that holds structure definition
@@ -160,8 +160,8 @@ Class _Struct {
           If RegExMatch(A_LoopField,"^\s*//") ;break on comments and continue main loop
               break
           If (A_LoopField){ ; skip empty lines
-              If (!_LF_ && _ArrType_:=RegExMatch(A_LoopField,"[\w\d_]\s+[\w\d_]")) ; new line, find out data type and save key in _LF_ Data type will be added later
-                _LF_:=RegExReplace(A_LoopField,"[\w\d_]\K\s+.*$")
+              If (!_LF_ && _ArrType_:=RegExMatch(A_LoopField,"[\w\d_#@]\s+[\w\d_#@]")) ; new line, find out data type and save key in _LF_ Data type will be added later
+                _LF_:=RegExReplace(A_LoopField,"[\w\d_#@]\K\s+.*$")
               If Instr(A_LoopField,"{"){ ; Union, also check if it is a structure
                 _union_++,_struct_.Insert(_union_,RegExMatch(A_LoopField,"i)^\s*struct\s*\{"))
               } else If InStr(A_LoopField,"}") ; end of union/struct
@@ -171,7 +171,7 @@ Class _Struct {
                     Loop % _union_
                       _ArrName_.=(_struct_[A_Index]?"struct":"") "{"
                 _offset_.=(_offset_ ? "," : "") _ArrName_ ((_ArrType_ && A_Index!=1)?(_LF_ " "):"") RegExReplace(A_LoopField,"\s+"," ")
-                _ArrName_:="",_union_:=0
+                ,_ArrName_:="",_union_:=0
               }
           }
         }
@@ -180,29 +180,35 @@ Class _Struct {
     }
 
     _offset_:=0                 
-    _union_:=[]                 ; keep track of union level, required to reset offset after union is parsed
-    _struct_:=[]                ; for each union level keep track if it is a structure (because here offset needs to increase
-    _union_size_:=[]          ; keep track of highest member within the union or structure, used to calculate new offset after union
-    _total_union_size_:=0     ; used in combination with above, each loop the total offset is updated if current data size is higher
-    _align_total_:=0			; used to calculate alignment for total size of structure
-	
-    this["`t"]:=0,this["`r"]:=0 ; will identify a Structure Pointer without members
+    ,_union_:=[]                 ; keep track of union level, required to reset offset after union is parsed
+    ,_struct_:=[]                ; for each union level keep track if it is a structure (because here offset needs to increase
+    ,_union_size_:=[]            ; keep track of highest member within the union or structure, used to calculate new offset after union
+    ,_struct_align_:=[]          ; keep track of alignment before structure
+    ,_total_union_size_:=0       ; used in combination with above, each loop the total offset is updated if current data size is higher
+    ,_align_total_:=0			; used to calculate alignment for total size of structure
+	,_in_struct_:=1
+    
+    ,this["`t"]:=0,this["`r"]:=0 ; will identify a Structure Pointer without members
 
     ; Parse given structure definition and create struct members
     ; User structures will be resolved by recrusive calls (!!! a structure must be a global variable)
-    Loop,Parse,_TYPE_,`,`;,%A_Space%%A_Tab%`n`r
+    Loop,Parse,_TYPE_,`,`; ;,%A_Space%%A_Tab%`n`r
     {
-      If ("" = _LF_ := A_LoopField)
-        Continue
+      _in_struct_+=StrLen(A_LoopField)+1
+      If ("" = _LF_ := trim(A_LoopField,A_Space A_Tab "`n`r"))
+        continue
+      _LF_BKP_:=_LF_ ;to check for ending brackets = union,struct
       _IsPtr_:=0
       ; Check for STARTING union and set union helpers
-      While (_match_:=RegExMatch(_LF_,"i)^\s*(struct|union)?\s*\{\K"))
-        _union_.Insert(_offset_)
+       While (_match_:=RegExMatch(_LF_,"i)^(struct|union)?\s*\{\K"))
+      ; correct offset for union/structure, sizeof_maxsize returns max size of union or structure
+        _max_size_:=sizeof_maxsize(SubStr(_TYPE_,_in_struct_-StrLen(A_LoopField)-1+(StrLen(_LF_BKP_)-StrLen(_LF_))))
+        ,_union_.Insert(_offset_+=(_mod_:=Mod(_offset_,_max_size_))?Mod(_max_size_-_mod_,_max_size_):0)
         ,_union_size_.Insert(0)
-        ,_struct_.Insert(RegExMatch(_LF_,"i)^\s*struct\s*\{")?1:0)
+        ,_struct_align_.Insert(_align_total_>_max_size_?_align_total_:_max_size_)
+        ,_struct_.Insert(RegExMatch(_LF_,"i)^struct\s*\{")?(1,_align_total_:=0):0)
         ,_LF_:=SubStr(_LF_,_match_)
-       
-      _LF_BKP_:=_LF_ ;to check for ending brackets = union,struct
+
       StringReplace,_LF_,_LF_,},,A ;remove all closing brackets (these will be checked later)
       
       ; Check if item is a pointer and remove * for further processing, separate key will store that information
@@ -210,11 +216,9 @@ Class _Struct {
         StringReplace,_LF_,_LF_,*
         _IsPtr_:=A_Index
       }
-
       ; Split off data type, name and size (only data type is mandatory)
-      RegExMatch(_LF_,"^\s*(?<ArrType_>[\w\d\._]+)?\s*(?<ArrName_>[\w\d_]+)?\s*\[?(?<ArrSize_>\d+)?\]?\s*\}*\s*$",_)
+      RegExMatch(_LF_,"^(?<ArrType_>[\w\d\._]+)?\s*(?<ArrName_>[\w\d_]+)?\s*\[?(?<ArrSize_>\d+)?\]?\s*\}*\s*$",_)
       If (!_ArrName_ && !_ArrSize_){
-        ; If (_ArrType_=_TYPE_ || (_ArrType_ "*") =_TYPE_ || ("*" _ArrType_=_TYPE_)) {
         If RegExMatch(_TYPE_,"^\**" _ArrType_ "\**$"){
           _Struct.___InitField(this,"",0,_ArrType_,_IsPtr_?"PTR":_Struct.HasKey("_" _ArrType_)?_Struct["_" _ArrType_]:"PTR",_IsPtr_,_ArrType_)
           this.base:=_base_
@@ -244,46 +248,48 @@ Class _Struct {
           else _defobj_:=_defobj_[A_LoopField]
       }
       if (!_IsPtr_ && !_Struct.HasKey(_ArrType_)){  ; _ArrType_ not found resolve to global variable (must contain struct definition)
-          ; If (A_PtrSize=8)
-			_offset_+=sizeof(_defobj_?_defobj_:%_ArrType_%,_offset_)-_offset_-sizeof(_defobj_?_defobj_:%_ArrType_%)
-          _Struct.___InitField(this,_ArrName_,_offset_,_ArrType_,0,0,_ArrType_,_ArrSize_)
-          ; update current union size
-        If _union_.MaxIndex()
-          _union_size_[_union_.MaxIndex()]:=(_offset_ + sizeof(_defobj_?_defobj_:%_ArrType_%) - _union_[_union_.MaxIndex()]>_union_size_[_union_.MaxIndex()])
-                                            ?(_offset_ + sizeof(_defobj_?_defobj_:%_ArrType_%) - _union_[_union_.MaxIndex()]):_union_size_[_union_.MaxIndex()]
+        _offset_+=sizeof(_defobj_?_defobj_:%_ArrType_%,_offset_,_align_total_)-_offset_-sizeof(_defobj_?_defobj_:%_ArrType_%)
+        ,_Struct.___InitField(this,_ArrName_,_offset_,_ArrType_,0,0,_ArrType_,_ArrSize_)
+        ; update current union size
+        If (_uix_:=_union_.MaxIndex()) && (_max_size_:=_offset_ + sizeof(_defobj_?_defobj_:%_ArrType_%) - _union_[_uix_])>_union_size_[_uix_]
+          _union_size_[_uix_]:=_max_size_
+        _max_size:=0
         ; if not a union or a union + structure then offset must be moved (when structure offset will be reset below
-        If (!_union_.MaxIndex()||_struct_[_struct_.MaxIndex()])
+        If (!_uix_||_struct_[_struct_.MaxIndex()])
           _offset_+=this[" " _ArrName_]*sizeof(_defobj_?_defobj_:%_ArrType_%) ; move offset
-          ;Continue
-          
+        ;Continue
       } else {
         If ((_IsPtr_ || _Struct.HasKey(_ArrType_)))
-			_offset_+=Mod(_offset_,(_IsPtr_?A_PtrSize:_Struct[_ArrType_]))=0
-                      ?0:(_IsPtr_?A_PtrSize:_Struct[_ArrType_])-Mod(_offset_,(_IsPtr_?A_PtrSize
-                      :_Struct[_ArrType_]))
-        _Struct.___InitField(this,_ArrName_,_offset_,_ArrType_,_IsPtr_?"PTR":_Struct.HasKey(_ArrType_)?_Struct["_" _ArrType_]:_ArrType_,_IsPtr_,_ArrType_,_ArrSize_)
+          _offset_+=(_mod_:=Mod(_offset_,_max_size_:=_IsPtr_?A_PtrSize:_Struct[_ArrType_]))=0?0:(_IsPtr_?A_PtrSize:_Struct[_ArrType_])-_mod_
+          ,_align_total_:=_max_size_>_align_total_?_max_size_:_align_total_
+          ,_Struct.___InitField(this,_ArrName_,_offset_,_ArrType_,_IsPtr_?"PTR":_Struct.HasKey(_ArrType_)?_Struct["_" _ArrType_]:_ArrType_,_IsPtr_,_ArrType_,_ArrSize_)
         ; update current union size
-        If _union_.MaxIndex()
-          _union_size_[_union_.MaxIndex()]:=(_offset_ + _Struct[this["`n" _ArrName_]] - _union_[_union_.MaxIndex()]>_union_size_[_union_.MaxIndex()])
-                                            ?(_offset_ + _Struct[this["`n" _ArrName_]] - _union_[_union_.MaxIndex()]):_union_size_[_union_.MaxIndex()]
+        If (_uix_:=_union_.MaxIndex()) && (_max_size_:=_offset_ + _Struct[this["`n" _ArrName_]] - _union_[_uix_])>_union_size_[_uix_]
+          _union_size_[_uix_]:=_max_size_
+        _max_size_:=0
         ; if not a union or a union + structure then offset must be moved (when structure offset will be reset below
-        If (!_union_.MaxIndex()||_struct_[_struct_.MaxIndex()])
+        If (!_uix_||_struct_[_uix_])
           _offset_+=_IsPtr_?A_PtrSize:(_Struct.HasKey(_ArrType_)?_Struct[_ArrType_]:%_ArrType_%)*this[" " _ArrName_]
       }
-      
-      
       ; Check for ENDING union and reset offset and union helpers
       While (SubStr(_LF_BKP_,0)="}"){
-        If !_union_.MaxIndex(){
+        If (!_uix_:=_union_.MaxIndex()){
           MsgBox,0, Incorrect structure, missing opening braket {`nProgram will exit now `n%_TYPE_%
           ExitApp
         } ; Increase total size of union/structure if necessary
-        _offset_:=_union_[_union_.MaxIndex()] ; reset offset because we left a union or structure
-        ,_total_union_size_ := _union_size_[_union_.MaxIndex()]>_total_union_size_?_union_size_[_union_.MaxIndex()]:_total_union_size_
-        _union_._Remove(),_struct_._Remove(),_union_size_._Remove(),_LF_BKP_:=SubStr(_LF_BKP_,1,StrLen(_LF_BKP_)-1) ; remove latest items
-        If !_union_.MaxIndex(){ ; leaving top union, add offset
-					if Mod(_total_union_size_,_align_total_.1)
-						_total_union_size_ += _align_total_.1-Mod(_total_union_size_,_align_total_.1)
+        ; reset offset and align because we left a union or structure
+        if (_uix_>1 && _struct_[_uix_-1]){
+          if (_mod_:=Mod(_offset_,_struct_align_[_uix_]))
+          _offset_+=Mod(_struct_align_[_uix_]-_mod_,_struct_align_[_uix_])
+        } else _offset_:=_union_[_uix_]
+        if (_struct_[_uix_]&&_struct_align_[_uix_]>_align_total_)
+          _align_total_ := _struct_align_[_uix_]
+        ; Increase total size of union/structure if necessary
+        _total_union_size_ := _union_size_[_uix_]>_total_union_size_?_union_size_[_uix_]:_total_union_size_
+        ,_union_._Remove(),_struct_._Remove(),_union_size_._Remove(),_struct_align_.Remove(),_LF_BKP_:=SubStr(_LF_BKP_,1,StrLen(_LF_BKP_)-1) ; remove latest items
+        If (_uix_=1){ ; leaving top union, add offset
+          if (_mod_:=Mod(_total_union_size_,_align_total_))
+			_total_union_size_ += Mod(_align_total_-_mod_,_align_total_)
           _offset_+=_total_union_size_,_total_union_size_:=0
         }
       }
@@ -385,7 +391,7 @@ Class _Struct {
   ___Clone(offset){
     static _base_:={__GET:_Struct.___GET,__SET:_Struct.___SET,__SETPTR:_Struct.___SETPTR,__Clone:_Struct.___Clone,__NEW:_Struct.___NEW
           ,IsPointer:_Struct.IsPointer,Offset:_Struct.Offset,Type:_Struct.Type,AHKType:_Struct.AHKType,Encoding:_Struct.Encoding
-          ,Capacity:_Struct.Capacity,Alloc:_Struct.Alloc,Size:_Struct.Size,SizeT:_Struct.SizeT}
+          ,Capacity:_Struct.Capacity,Alloc:_Struct.Alloc,Size:_Struct.Size,SizeT:_Struct.SizeT,Print:_Struct.Print}
     If offset=1
       return this
     newobj:={} ; new structure object

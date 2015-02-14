@@ -35,8 +35,11 @@ ZipFileRaw(fileIn,fileOut,password:=""){
 		  DllCall("crypt32\CryptBinaryToStringA","PTR",buffer,"UINT",len,"UInt",0x1,"PTR",0,"UInt*",encLen:=0)
 		  ,VarSetCapacity(buff,encLen*2,0)
 		  ,DllCall("crypt32\CryptBinaryToStringA","PTR",buffer,"UINT",len,"UInt",0x1,"PTR",&buff,"UInt*",encLen)
-		  ,encLen:=CryptAES(buff,encLen,password) ; encLen + 1???
-		  ,pBuff:=&buff
+		  if (!encLen:=CryptAES(buff,encLen,password)){ ; encLen + 1???
+			MsgBox Error CryptAES
+			return
+		  }
+		  pBuff:=&buff
 		} else pBuff:=buffer,encLen:=0
 		hdr:=Struct("UInt[5]",[0x4034b50,0,len,sz,encLen])
 		,HashData(pBuff,encLen?encLen:len,hdr[] + 4,4)

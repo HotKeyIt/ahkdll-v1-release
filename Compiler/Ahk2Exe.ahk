@@ -210,11 +210,6 @@ Loop, %A_ScriptDir%\..\*.bin,0,1
 {
 	SplitPath,A_LoopFileFullPath,,d,, n
 	FileGetVersion, v, %A_LoopFileFullPath%
-	; Listvars
-	; MsgBox % SubStr(d,StrLen(A_ScriptDir)+2)
-	; If (d:=SubStr(d,StrLen(A_ScriptDir)+2))
-		; BinFiles.Insert(d "\" n ".bin")
-	; else 
 	BinFiles.Insert(A_LoopFileFullPath)
 	BinNames .= "|v" v " " n ".bin (..\" SubStr(d,InStr(d,"\",1,0)+1) ")"
 }
@@ -224,9 +219,6 @@ Loop, %A_ScriptDir%\..\*.exe,0,1
 	FileGetVersion, v, %A_LoopFileFullPath%
 	If !InStr(FileGetInfo(A_LoopFileFullPath,"FileDescription"),"AutoHotkey")
 		continue
-	; If (d:=SubStr(d,StrLen(A_ScriptDir)+2))
-		; BinFiles._Insert(d "\" n ".exe")
-	; else 
 	BinFiles.Insert(A_LoopFileFullPath)
 	BinNames .= "|v" v " " n ".exe" " (..\" SubStr(d,InStr(d,"\",1,0)+1) ")"
 }
@@ -236,9 +228,6 @@ Loop, %A_ScriptDir%\..\*.dll,0,1
 	FileGetVersion, v, %A_LoopFileFullPath%
 	If !InStr(FileGetInfo(A_LoopFileFullPath,"FileDescription"),"AutoHotkey")
 		continue
-	; If (d:=SubStr(d,StrLen(A_ScriptDir)+2))
-		; BinFiles.Insert(d "\" n ".dll")
-	; else 
 	BinFiles.Insert(A_LoopFileFullPath)
 	BinNames .= "|v" v " " n ".dll" " (..\" SubStr(d,InStr(d,"\",1,0)+1) ")"
 }
