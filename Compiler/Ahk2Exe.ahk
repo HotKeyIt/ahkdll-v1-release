@@ -178,9 +178,11 @@ hRSrc := DllCall("FindResource", "PTR", 0,"STR", "LOGO.PNG", "PTR", 10)
 sData := SizeofResource(0, hRSrc)
 hRes  := LoadResource(0, hRSrc)
 pData := LockResource(hRes)
+If NumGet(pData+0,0,"UInt")=0x04034b50
+	sData:=UnZipRawMemory(pData,resLogo),pData:=&resLogo
 hGlob := GlobalAlloc(2, sData) ; 2=GMEM_MOVEABLE
 pGlob := GlobalLock(hGlob)
-#DllImport,memcpy,msvcrt\memcpy,ptr,,ptr,,uint,,CDecl
+#DllImport,memcpy,msvcrt\memcpy,ptr,,ptr,,ptr,,CDecl
 memcpy(pGlob, pData, sData)
 GlobalUnlock(hGlob)
 CreateStreamOnHGlobal(hGlob, 1, getvar(pStream:=0))
@@ -376,7 +378,7 @@ ConvertCLI:
 If UseEncrypt && !UsePassword
 {
 	if !CLIMode
-		MsgBox, 64, Ahk2Exe, Conversion complete.
+		MsgBox, 64, Ahk2Exe, Error compiling`, no password supplied: %ExeFile%
 	else
 		FileAppend, Error compiling`, no password supplied: %ExeFile%`n, *
 	return
@@ -384,7 +386,7 @@ If UseEncrypt && !UsePassword
 else If (UseEncrypt && SubStr(BinFile,-3)!=".bin")
 {
 	if !CLIMode
-		MsgBox, 64, Ahk2Exe, Resulting exe will not be protected properly, use .bin file to have more secure protection.
+		MsgBox, 64, Ahk2Exe, Resulting exe will not be protected properly, use AutoHotkeySC.bin file to have more secure protection.
 	else
 		FileAppend, Warning`, Resulting exe will not be protected properly`, use AutoHotkeySC.bin file to have more secure protection.: %ExeFile%`n, *
 }

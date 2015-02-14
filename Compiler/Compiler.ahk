@@ -96,8 +96,8 @@ BundleAhkScript(ExeFile, AhkFile, IcoFile := "", UseCompression := 0, UsePasswor
 		if !DllCall("UpdateResource", "ptr", module, "ptr", 10, "str", resname
 				  , "ushort", 0x409, "ptr", &filedata, "uint", filesize, "uint")
 			goto _FailEnd2
-		VarSetCapacity(filedata, 0)
 	}
+	VarSetCapacity(filedata, 0)
 	
 	gosub _EndUpdateResource
 	

@@ -65,7 +65,7 @@ EnumIcons(ExeFile, iconID)
 		return
 	
 	_EI_HighestIconID := 0
-	if EnumResourceNames(hModule, 3, pEnumFunc) = 0
+	if DllCall("EnumResourceNames","PTR",hModule,"PTR",3,"PTR", pEnumFunc) = 0
 	{
 		FreeLibrary(hModule)
 		return
@@ -78,7 +78,6 @@ EnumIcons(ExeFile, iconID)
 	
 	wCount := NumGet(pDirHeader+4, "UShort")
 	,iconIDs := []
-	
 	Loop, %wCount%
 	{
 		pResDirEntry := pResDir + (A_Index-1)*14
