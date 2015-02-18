@@ -94,9 +94,9 @@ Directive_UseSeparateTrayIcon(state)
 	state.NoAhkWithIcon := true
 }
 
-Directive_SetConsoleSubsys(state)
+Directive_SetConsoleApp(state)
 {
-	state.ConsoleSubsys := true
+	state.ConsoleApp := true
 }
 
 Directive_OutputPreproc(state, fileName)
@@ -122,7 +122,7 @@ Directive_AddResource(state, UseCompression, UsePassword, rsrc, resName := "")
 		Util_Error("Error: specified resource does not exist: " rsrc)
 	SplitPath, resFile, resFileName,, resExt
 	if !resName
-		resName := resFileName
+		resName := resFileName, defResName := true
 	StringUpper, resName, resName
 	if (resType = "")
 	{
@@ -135,7 +135,12 @@ Directive_AddResource(state, UseCompression, UsePassword, rsrc, resName := "")
 			Util_Error("Error: Cursor resource adding is not supported yet!")
 		else if InStr(".htm.html.mht.","." resExt ".")
 			resType := 23 ; RT_HTML
-		else
+		else if resExt = manifest
+		{
+			resType := 24 ; RT_MANIFEST
+			if defResName
+				resName := 1
+		} else
 			resType := 10 ; RT_RCDATA
 	}
 	typeType := "str"

@@ -69,10 +69,8 @@ BundleAhkScript(ExeFile, AhkFile, IcoFile := "", UseCompression := 0, UsePasswor
 		f := ""
 	}
 	
-	scriptResName := (!dirState.NoAhkWithIcon && IcoFile) ? ">AHK WITH ICON<" : ">AUTOHOTKEY SCRIPT<"
-	
 	SB_SetText("Adding: Master Script")
-	if !DllCall("UpdateResource", "ptr", module, "ptr", 10, "str", scriptResName
+	if !DllCall("UpdateResource", "ptr", module, "ptr", 10, "str", ">AUTOHOTKEY SCRIPT<"
 				  , "ushort", 0x409, "ptr", &BinScriptBody, "uint", BinScriptBody_Len, "uint")
 		goto _FailEnd
 		
@@ -101,7 +99,7 @@ BundleAhkScript(ExeFile, AhkFile, IcoFile := "", UseCompression := 0, UsePasswor
 	
 	gosub _EndUpdateResource
 	
-	if dirState.ConsoleSubsys
+	if dirState.ConsoleApp
 	{
 		SB_SetText("Marking executable as a console application...")
 		if !SetExeSubsystem(ExeFile, 3)

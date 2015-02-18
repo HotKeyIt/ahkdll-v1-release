@@ -13,6 +13,5 @@ CryptAES(ByRef lp,sz,pw,e:=1,SID:=256){
 	else
 		CryptDecrypt(hK,0,1,0,&lp,sz)
 	CryptDestroyKey(hK),CryptReleaseContext(hP,0)
-	MsgBox % "size: " sz
 	return sz
 }
