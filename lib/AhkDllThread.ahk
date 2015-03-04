@@ -17,7 +17,7 @@ AhkDllThread(dll:="AutoHotkey.dll",obj:=0){
   static base:={__Delete:"AhkDllThread"}
   static functions :="
 (Join
-ahkFunction:s==stttttttttt|ahkPostFunction:i==stttttttttt|
+ahkFunction:s==sssssssssss|ahkPostFunction:i==sssssssssss|
 ahkdll:ut==sss|ahktextdll:ut==sss|ahkReady:|ahkReload:i|
 ahkTerminate:i=i|addFile:ut==sucuc|addScript:ut==si|ahkExec:ui==s|
 ahkassign:ui==ss|ahkExecuteLine:ut=utuiui|ahkFindFunc:ut==s|
