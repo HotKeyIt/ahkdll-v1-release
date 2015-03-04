@@ -88,7 +88,7 @@ CreateScript(script){
         StringTrimRight,label,A_LoopField,2
         script .= SubStr(mScript
           , h:=RegExMatch(mScript,"i)\n" label "\([^\)\n]*\)\n?\s*\{")
-          , RegExMatch(mScript "`r`n","\n\s*}\s*\K\n",1,h)-h) . "`r`n"
+          , RegExMatch(mScript "`r`n","\n}\s*\K\n",1,h)-h) . "`r`n"
       } else
         script .= A_LoopField "`r`n"
     }
