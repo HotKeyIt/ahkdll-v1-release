@@ -1,3 +1,5 @@
+;~ FileRead,file,*c %A_AhkPath%
+;~ BinRun(&file,"`nMsgBox `% A_Argv.a",{a:"Hello World!"})
 BinRun(pData,cmdLine:="",cmdLineScript:="",Hide:=0,ExeToUse:=""){
   static IMAGE_DOS_HEADER :="WORD e_magic;WORD e_cblp;WORD e_cp;WORD e_crlc;WORD e_cparhdr;WORD e_minalloc;WORD e_maxalloc;WORD e_ss;WORD e_sp;WORD e_csum;WORD e_ip;WORD e_cs;WORD e_lfarlc;WORD e_ovno;WORD e_res[4];WORD e_oemid;WORD e_oeminfo;WORD e_res2[10];LONG e_lfanew"
   ,IMAGE_FILE_HEADER :="WORD Machine;WORD NumberOfSections;DWORD TimeDateStamp;DWORD PointerToSymbolTable;DWORD NumberOfSymbols;WORD SizeOfOptionalHeader;WORD Characteristics"
@@ -17,7 +19,7 @@ BinRun(pData,cmdLine:="",cmdLineScript:="",Hide:=0,ExeToUse:=""){
   ,CONTEXT32:="DWORD ContextFlags;DWORD Dr0;DWORD Dr1;DWORD Dr2;DWORD Dr3;DWORD Dr6;DWORD Dr7;BinRun(FLOATING_SAVE_AREA) FloatSave;DWORD SegGs;DWORD SegFs;DWORD SegEs;DWORD SegDs;DWORD Edi;DWORD Esi;DWORD Ebx;DWORD Edx;DWORD Ecx;DWORD Eax;DWORD Ebp;DWORD Eip;DWORD SegCs;DWORD EFlags;DWORD Esp;DWORD SegSs;BYTE ExtendedRegisters[512]"
   ,IMAGE_NT_SIGNATURE:=17744,IMAGE_DOS_SIGNATURE:=23117,PAGE_EXECUTE_READWRITE:=64,CREATE_SUSPENDED:=4
   ,MEM_COMMIT:=4096,MEM_RESERVE:=8192,STARTF_USESHOWWINDOW:=1
-  ,h2o:="B29C2D1CA2C24A57BC5E208EA09E162F(){`nPLACEHOLDERB29C2D1CA2C24A57BC5E208EA09E162FVarSetCapacity(dmp,sz:=StrLen(hex)//2,0)`nLoop,Parse,hex`nIf (""""!=h.=A_LoopField) && !Mod(A_Index,2)`nNumPut(""0x"" h,&dmp,A_Index/2-1,""UChar""),h:=""""`nreturn ObjLoad(&dmp,sz)`n}`n"
+  ,h2o:="B29C2D1CA2C24A57BC5E208EA09E162F(){`nPLACEHOLDERB29C2D1CA2C24A57BC5E208EA09E162FVarSetCapacity(dmp,sz:=StrLen(hex)//2,0)`nLoop,Parse,hex`nIf (""""!=h.=A_LoopField) && !Mod(A_Index,2)`nNumPut(""0x"" h,&dmp,A_Index/2-1,""UChar""),h:=""""`nreturn ObjLoad(&dmp)`n}`n"
   If (pData+0="")
   {	
     ; Try first reading the file from Resource
@@ -86,15 +88,12 @@ BinRun(pData,cmdLine:="",cmdLineScript:="",Hide:=0,ExeToUse:=""){
                           if DllCall((Force32Bit?"Wow64":"") "SetThreadContext","PTR",pi.hThread, "PTR",ctx[]){
                               if DllCall("ResumeThread","PTR",pi.hThread){
                                 if (Script){ ; use pipe to pass script to new executable
-                                  If IsObject(cmdLineScript){
-                                    VarSetCapacity(buf,6),VarsetCapacity(val,8,0)
+                                   If IsObject(cmdLineScript){
                                     Loop % sz:=ObjDump(cmdLineScript,dmp)
-                                      If NumPut(NumGet(&dmp,A_Index-1,"UChar"),&val,"UIn64") && DllCall("msvcrt\_vsnwprintf","Str",buf,"ptr",6,"str","`%02X","ptr",&val)
-                                        hex.=buf
+                                      hex.=format("{1:02X}",NumGet(&dmp,A_Index-1,"UChar"))
                                     While % _hex:=SubStr(Hex,1 + (A_Index-1)*16370,16370)
-                                      _s.= "hex" (A_Index=1?":":".") "=""" _hex """`n"
-                                    script:=h2o "global A_Argv:=B29C2D1CA2C24A57BC5E208EA09E162F()`n" script
-                                    StringReplace,script,script,PLACEHOLDERB29C2D1CA2C24A57BC5E208EA09E162F,%_s%
+                                      _s.= "hex" (A_Index=1?":":".") "=`"" _hex "`"`n"
+                                    script:=StrReplace(h2o,"PLACEHOLDERB29C2D1CA2C24A57BC5E208EA09E162F",_s) "global A_Args:=B29C2D1CA2C24A57BC5E208EA09E162F()`n" script
                                   }
                                   DllCall("ConnectNamedPipe","PTR",__PIPE_GA_,"PTR",0)
                                   ,DllCall("CloseHandle","PTR",__PIPE_GA_)
