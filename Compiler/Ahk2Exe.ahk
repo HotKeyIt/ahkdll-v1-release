@@ -19,6 +19,7 @@
 #Include %A_ScriptDir%
 #Include Compiler.ahk
 SendMode Input
+Menu,Tray,Icon,%A_AhkPath%,2
 
 global DEBUG := !A_IsCompiled
 
@@ -372,13 +373,13 @@ If UseEncrypt && !UsePassword
 		FileAppend, Error compiling`, no password supplied: %ExeFile%`n, *
 	return
 }
-else If (UseEncrypt && SubStr(BinFile,-3)!=".bin")
-{
-	if !CLIMode
-		MsgBox, 64, Ahk2Exe, Resulting exe will not be protected properly, use AutoHotkeySC.bin file to have more secure protection.
-	else
-		FileAppend, Warning`, Resulting exe will not be protected properly`, use AutoHotkeySC.bin file to have more secure protection.: %ExeFile%`n, *
-}
+; else If (UseEncrypt && SubStr(BinFile,-3)!=".bin")
+; {
+	; if !CLIMode
+		; MsgBox, 64, Ahk2Exe, Resulting exe will not be protected properly, use AutoHotkeySC.bin file to have more secure protection.
+	; else
+		; FileAppend, Warning`, Resulting exe will not be protected properly`, use AutoHotkeySC.bin file to have more secure protection.: %ExeFile%`n, *
+; }
 AhkCompile(AhkFile, ExeFile, IcoFile, BinFile, UseMpress, UseCompression, UseInclude, UseIncludeResource, UseEncrypt?UsePassword:"")
 if !CLIMode
 	MsgBox, 64, Ahk2Exe, Conversion complete.
