@@ -137,7 +137,7 @@ PreprocessScript(ByRef ScriptText, AhkScript, ExtraFiles, FileList := "", FirstS
 	Loop, % !!IsFirstScript ; equivalent to "if IsFirstScript" except you can break from the block
 	{
 		SB_SetText("Auto-including any functions called from a library...")
-		ilibfile := A_Temp "\_ilib.ahk"
+		ilibfile := FirstScriptDir "\97DC7311BAB2456FA272D3D5DCE54722.ahk"
 		FileDelete, %ilibfile%
 		FileDelete, %ilibfile%.script
 		static AhkPath := A_IsCompiled ? A_ScriptDir "\..\AutoHotkey.exe" : A_AhkPath
@@ -152,7 +152,8 @@ PreprocessScript(ByRef ScriptText, AhkScript, ExtraFiles, FileList := "", FirstS
 			Util_Error("Error: The script contains syntax errors.")
 		If FileExist(ilibfile)
 			PreprocessScript(ScriptText, ilibfile, ExtraFiles, FileList, FirstScriptDir, Options)
-		
+		FileDelete, %ilibfile%
+		FileDelete, %ilibfile%.script
 		StringTrimRight, ScriptText, ScriptText, 1 ; remove trailing newline
 	}
 	
