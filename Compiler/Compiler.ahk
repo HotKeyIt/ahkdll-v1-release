@@ -70,7 +70,7 @@ BundleAhkScript(ExeFile, AhkFile, IcoFile := "", UseCompression := 0, UsePasswor
 	}
 	
 	SB_SetText("Adding: Master Script")
-	if !DllCall("UpdateResource", "ptr", module, "ptr", 10, "str", ">AUTOHOTKEY SCRIPT<"
+	if !DllCall("UpdateResource", "ptr", module, "ptr", 10, "str", "E4847ED08866458F8DD35F94B37001C0"
 				  , "ushort", 0x409, "ptr", &BinScriptBody, "uint", BinScriptBody_Len, "uint")
 		goto _FailEnd
 		
