@@ -205,9 +205,8 @@ WatchDirectory(p*){
             FNI:=A_Index>1?(new _Struct(FILE_NOTIFY_INFORMATION,FNI[""]+FNI.NextEntryOffset)):(new _Struct(FILE_NOTIFY_INFORMATION,@[LP].FNI[""]))
             If (FNI.Action < 0x6){
                FileName:=@[LP].dir . StrGet(FNI.FileName[""],FNI.FileNameLength/2,"UTF-16")
-               If (FNI.Action=FILE_ACTION_RENAMED_OLD_NAME)
-                     FileFromOptional:=FileName
-               If (@[LP].FLT="" || RegExMatch(FileName,@[LP].FLT) || FileFrom)
+               If ((FNI.Action=FILE_ACTION_RENAMED_OLD_NAME && FileFromOptional:=FileName)
+								|| @[LP].FLT="" || RegExMatch(FileName,@[LP].FLT) || RegExMatch(FileFrom,@[LP].FLT) || InStr(FileExist(FileName),"D"))
                   If (FNI.Action=FILE_ACTION_ADDED){
                      FileTo:=FileName
                   } else If (FNI.Action=FILE_ACTION_REMOVED){
