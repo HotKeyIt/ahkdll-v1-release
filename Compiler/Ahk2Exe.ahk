@@ -335,6 +335,9 @@ Gui, +OwnDialogs
 FileSelectFile, ov, 1, %LastScriptDir%, Open, AutoHotkey files (*.ahk)
 if ErrorLevel
 	return
+SplitPath, ov,,, ovExt
+if !StrLen(ovExt) ;~ append a default file extension is none specified
+	ov .= ".exe"
 GuiControl,, AhkFile, %ov%
 return
 
