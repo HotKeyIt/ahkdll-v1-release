@@ -28,9 +28,7 @@ InjectAhkDll(PID,dll="AutoHotkey.dll",script=0){
   If IsObject(PID){
     If (dll!="Exec" && script)
       return DllCall("MessageBox","PTR",0,"Str","Only Exec method can be used here!","STR","Error","UInt",0)
-    Process,Exist,% PID.PID
-    If !ErrorLevel
-      return
+    
     hProc := DllCall("OpenProcess", "UInt", PROCESS_ALL_ACCESS, "Int",0, "UInt", PID.PID,"PTR")
     If !hProc
       return DllCall("MessageBox","PTR",0,"Str","Could not open process for PID: " PID.PID,"STR","Error","UInt",0)
