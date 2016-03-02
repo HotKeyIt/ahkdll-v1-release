@@ -216,7 +216,7 @@ Loop, %A_ScriptDir%\..\*.bin,0,1
 }
 Loop, %A_ScriptDir%\..\*.exe,0,1
 {
-  SplitPath,A_LoopFileFullPath,,d,, n
+	SplitPath,A_LoopFileFullPath,,d,, n
 	FileGetVersion, v, %A_LoopFileFullPath%
 	If !InStr(FileGetInfo(A_LoopFileFullPath,"FileDescription"),"AutoHotkey")
 		continue
@@ -225,7 +225,7 @@ Loop, %A_ScriptDir%\..\*.exe,0,1
 }
 Loop, %A_ScriptDir%\..\*.dll,0,1
 {
-  SplitPath, A_LoopFileFullPath,,d,, n
+	SplitPath, A_LoopFileFullPath,,d,, n
 	FileGetVersion, v, %A_LoopFileFullPath%
 	If !InStr(FileGetInfo(A_LoopFileFullPath,"FileDescription"),"AutoHotkey")
 		continue

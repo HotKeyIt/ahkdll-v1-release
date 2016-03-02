@@ -151,10 +151,11 @@ Directive_AddResource(state, UseCompression, UsePassword, rsrc, resName := "")
 	if resName is integer
 		if resName between 0 and 0xFFFF
 			nameType := "PTR"
-	If UseCompression {
-		fSize:=ZipFileRaw(resFile,A_Temp "\Ahk2Exe_compress_script.bin")
-		FileRead,fData,% "*c " A_Temp "\Ahk2Exe_compress_script.bin"
-		FileDelete % A_Temp "\Ahk2Exe_compress_script.bin"
+	If UseCompression{
+		FileRead, tempdata, *c %resFile%
+		FileGetSize, tempsize, %resFile%
+		If !fSize := ZipRawMemory(&tempdata, tempsize, fData)
+			Util_Error("Error: Could not compress the file to: " file)
 	} else {
 		FileGetSize, fSize, %resFile%
 		FileRead, fData, *c %resFile%

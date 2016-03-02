@@ -44,14 +44,12 @@ BundleAhkScript(ExeFile, AhkFile, IcoFile := "", UseCompression := 0, UsePasswor
 	ExtraFiles := []
 	,Directives := PreprocessScript(ScriptBody, AhkFile, ExtraFiles)
 	,ScriptBody :=Trim(ScriptBody,"`n")
-	;StringReplace,ScriptBody,ScriptBody,`n,`r`n,All
+	;~ StringReplace,ScriptBody,ScriptBody,`n,`r`n,All
 	VarSetCapacity(BinScriptBody, BinScriptBody_Len:=StrPut(ScriptBody, "UTF-8"))
 	StrPut(ScriptBody, &BinScriptBody, "UTF-8")
 	If UseCompression {
-		If !BinScriptBody_Len:=ZipFileRaw(&BinScriptBody,BinScriptBody_Len "|" A_Temp "\Ahk2Exe_compress_script.bin",UsePassword)
-			Util_Error("Error: Could not compress the source file to: " A_Temp "\Ahk2Exe_compress_script.bin")
-		FileRead,BinScriptBody,% "*c " A_Temp "\Ahk2Exe_compress_script.bin"
-		FileDelete % A_Temp "\Ahk2Exe_compress_script.bin"
+		If !BinScriptBody_Len := ZipRawMemory(&BinScriptBody,BinScriptBody_Len, BinScriptBody, UsePassword)
+			Util_Error("Error: Could not compress the source file.")
 	}
 	
 	module := BeginUpdateResource(ExeFile)
@@ -81,15 +79,15 @@ BundleAhkScript(ExeFile, AhkFile, IcoFile := "", UseCompression := 0, UsePasswor
 		
 		If !FileExist(file)
 			goto _FailEnd2
-		If UseCompression
-			filesize:=ZipFileRaw(file,A_Temp "\Ahk2Exe_compress_script.bin")
-		else FileGetSize,filesize,%file%
-		; This "old-school" method of reading binary files is way faster than using file objects.
-		VarSetCapacity(filedata, filesize)
-		If UseCompression {
-			FileRead, filedata,% "*c " A_Temp "\Ahk2Exe_compress_script.bin"
-			FileDelete % A_Temp "\Ahk2Exe_compress_script.bin"
-		} else FileRead, filedata,*c %file%
+		If UseCompression{
+			FileRead, tempdata, *c %file%
+			FileGetSize, tempsize, %file%
+			If !filesize := ZipRawMemory(&tempdata, tempsize, filedata)
+				Util_Error("Error: Could not compress the file to: " file)
+		} else {
+			FileRead, filedata, *c %file%
+			FileGetSize, filesize, %file%
+		}
 		
 		if !DllCall("UpdateResource", "ptr", module, "ptr", 10, "str", resname
 				  , "ushort", 0x409, "ptr", &filedata, "uint", filesize, "uint")
