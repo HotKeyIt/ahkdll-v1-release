@@ -116,7 +116,7 @@ Directive_UseResourceLang(state, resLang)
 Directive_AddResource(state, UseCompression, UsePassword, rsrc, resName := "")
 {
 	resType := "" ; auto-detect
-	if RegExMatch(rsrc, "^\*(\w+)\s+([^ ].+)$", o)
+	if RegExMatch(rsrc, "^\s*(\w+|d+)\s+(.+)$", o)
 		resType := o1, rsrc := o2
 	if !resFile := Util_GetFullPath(rsrc)
 		Util_Error("Error: specified resource does not exist: " rsrc)
@@ -133,7 +133,7 @@ Directive_AddResource(state, UseCompression, UsePassword, rsrc, resName := "")
 			Util_Error("Error: Icon resource adding is not supported yet!")
 		else if (resExt = "cur")
 			Util_Error("Error: Cursor resource adding is not supported yet!")
-		else if InStr(".htm.html.mht.","." resExt ".")
+		else if InStr(".htm.html.mht.js.css.","." resExt ".")
 			resType := 23 ; RT_HTML
 		else if resExt = manifest
 		{
@@ -151,7 +151,7 @@ Directive_AddResource(state, UseCompression, UsePassword, rsrc, resName := "")
 	if resName is integer
 		if resName between 0 and 0xFFFF
 			nameType := "PTR"
-	If UseCompression{
+	If UseCompression && resType=10{
 		FileRead, tempdata, *c %resFile%
 		FileGetSize, tempsize, %resFile%
 		If !fSize := ZipRawMemory(&tempdata, tempsize, fData)
