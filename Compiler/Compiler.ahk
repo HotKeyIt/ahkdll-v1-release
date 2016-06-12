@@ -44,18 +44,25 @@ BundleAhkScript(ExeFile, AhkFile, IcoFile := "", UseCompression := 0, UsePasswor
 	ExtraFiles := []
 	,Directives := PreprocessScript(ScriptBody, AhkFile, ExtraFiles)
 	,ScriptBody :=Trim(ScriptBody,"`n")
-	;~ StringReplace,ScriptBody,ScriptBody,`n,`r`n,All
-	VarSetCapacity(BinScriptBody, BinScriptBody_Len:=StrPut(ScriptBody, "UTF-8"))
-	StrPut(ScriptBody, &BinScriptBody, "UTF-8")
+	,VarSetCapacity(BinScriptBody, BinScriptBody_Len:=StrPut(ScriptBody, "UTF-8"))
+	,StrPut(ScriptBody, &BinScriptBody, "UTF-8")
 	If UseCompression {
-		DllCall("Crypt32.dll\CryptBinaryToStringA","PTR",&BinScriptBody,"UInt",BinScriptBody_Len,"UInt",0x1,"PTR",0,"UInt",getvar(Len:=0))
-		VarSetCapacity(BinScriptBodyData,dataLength:=Len + 4, 0)
-		NumPut(BinScriptBody_Len,&BinScriptBodyData,"UInt")
-		DllCall("Crypt32.dll\CryptBinaryToStringA","PTR",&BinScriptBody,"UInt",BinScriptBody_Len,"UInt",0x1,"PTR",(&BinScriptBodyData) + 4,"UInt",getvar(Len))
-		hz:=ZipCreateBuffer(dataLength + 1024,UsePassword)
-		ZipAddbuffer(hz, &BinScriptBodyData,dataLength, "")
-		VarsetCapacity(BinScriptBodyData,0)
-		If !BinScriptBody_Len := ZipCloseBuffer(hz, BinScriptBody)
+		VarSetCapacity(buf,bufsz:=65536,00),totalsz:=0,VarSetCapacity(buf1,65536)
+		Loop, Parse,ScriptBody,`n,`r
+		{
+			len:=StrPutVar(A_LoopField,data,"UTF-8")
+			,sz:=ZipRawMemory(&data, len, zip, UsePassword)
+			,DllCall("crypt32\CryptBinaryToStringA","PTR", &zip,"UInt", sz,"UInt", 0x1|0x40000000,"UInt", 0,"UIntP", cryptedsz)
+			,tosavesz:=cryptedsz
+			,DllCall("crypt32\CryptBinaryToStringA","PTR", &zip,"UInt", sz,"UInt", 0x1|0x40000000,"PTR", &buf1,"UIntP", cryptedsz)
+			,NumPut(10,&buf1,cryptedsz)
+			if (totalsz+tosavesz>bufsz)
+				VarSetCapacity(buf,bufsz*=2)
+			RtlMoveMemory((&buf) + totalsz,&buf1,tosavesz)
+			,totalsz+=tosavesz
+		}
+		NumPut(0,&buf,totalsz-1,"UShort")
+		If !BinScriptBody_Len := ZipRawMemory(&buf,totalsz,BinScriptBody,"AutoHotkey")
 			Util_Error("Error: Could not compress the source file.")
 	}
 	
