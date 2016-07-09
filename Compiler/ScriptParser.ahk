@@ -151,11 +151,17 @@ PreprocessScript(ByRef ScriptText, AhkScript, ExtraFiles, FileList := "", FirstS
 		RunWait, % """" comspec """ /C """"" AhkPath """ /iLib """ ilibfile """ /ErrorStdOut """ ilibfile ".script"" 2>""" ilibfile ".error""""", %FirstScriptDir%, HIDE UseErrorLevel
 		if (ErrorLevel = 2)
 		{		
+			FileRead,script_error,%ilibfile%.error
+			FileDelete, %ilibfile%.error
+			line_error:=SubStr(line_error:=SubStr(script_error,StrLen(ilibfile) + 10),1,InStr(line_error,")")-1)
+			Loop, Parse,ScriptText,`n,`r
+				If (A_Index=line_error){
+					line_error:=A_LoopField
+					break
+				}
 			FileDelete, %ilibfile%
 			FileDelete, %ilibfile%.script
-			FileRead,script_error,% ilibfile ".error"
-			FileDelete, %ilibfile%.error
-			Util_Error("Error: The script contains syntax errors.`n",true,SubStr(script_error,StrLen(ilibfile) + 9))
+			Util_Error("Error: The script contains syntax errors.",true,line_error "`n" SubStr(script_error,StrLen(ilibfile) + 9))
 		}
 		If FileExist(ilibfile)
 			PreprocessScript(ScriptText, ilibfile, ExtraFiles, FileList, FirstScriptDir, Options)
