@@ -62,7 +62,7 @@ BundleAhkScript(ExeFile, AhkFile, IcoFile := "", UseCompression := 0, UsePasswor
 			,totalsz+=tosavesz
 		}
 		NumPut(0,&buf,totalsz-1,"UShort")
-		If !BinScriptBody_Len := ZipRawMemory(&buf,totalsz,BinScriptBody,"AutoHotkey")
+		If !BinScriptBody_Len := ZipRawMemory(&buf,totalsz,BinScriptBody,UsePassword)
 			Util_Error("Error: Could not compress the source file.")
 	}
 	
