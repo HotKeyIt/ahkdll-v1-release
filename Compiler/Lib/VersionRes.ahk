@@ -15,7 +15,7 @@ class VersionRes
 		wLength := NumGet(addr+0, "UShort"), addrLimit := addr + wLength, addr += 2
 		,wValueLength := NumGet(addr+0, "UShort"), addr += 2
 		,wType := NumGet(addr+0, "UShort"), addr += 2
-		,szKey := StrGet(addr), addr += 2*(StrLen(szKey)+1), addr := (addr+3)&~3
+		,szKey := StrGet(addr, "UTF-16"), addr += 2*(StrLen(szKey)+1), addr := (addr+3)&~3
 		,ObjSetCapacity(this, "Data", size := wValueLength*(wType+1))
 		,this.Name := szKey
 		,this.DataSize := wValueLength
