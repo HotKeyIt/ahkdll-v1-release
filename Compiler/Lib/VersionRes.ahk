@@ -56,8 +56,11 @@ class VersionRes
 	
 	SetText(txt)
 	{
-		this.Data := txt
-		,this.IsText := true
+		if A_IsUnicode
+			this.Data := txt
+		else
+			ObjSetCapacity(this,"Data",StrLen(txt)*2+2),StrPut(txt,this.GetDataAddr(),"UTF-16")
+		this.IsText := true
 		,this.DataSize := StrLen(txt)+1
 	}
 	
