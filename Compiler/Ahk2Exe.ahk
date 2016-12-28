@@ -85,7 +85,7 @@ Gui, Add, Button, x461 y204 w53 h23 gBrowseIco, Br&owse
 ToolTip.Add("Button5","Select Icon to use in resulting exe / dll")
 Gui, Add, Button, x519 y204 w53 h23 gDefaultIco, D&efault
 ToolTip.Add("Button6","Use default Icon")
-Gui, Add, Text, x18 y237, Base File (.bin)
+Gui, Add, Text, x18 y237, Base File (.bin)`n`nUse Win32a for ANSI`nand Win32w or x64w`nfor Unicode compilation!
 Gui, Add, DDL, x138 y233 w315 h23 R10 AltSubmit vBinFileId Choose%BinFileId%, %BinNames%
 ToolTip.Add("ComboBox1","Select AutoHotkey binary file to use for compilation")
 Gui, Add, CheckBox, x138 y260 w315 h20 gCheckCompression vUseCompression Checked%LastUseCompression%, Use compression to reduce size of resulting executable
