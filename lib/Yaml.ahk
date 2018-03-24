@@ -412,7 +412,7 @@ Yaml_CharUni( string ) {
 Yaml_EscIfNeed(s){
   If (s="")
     return "''"
-  else If RegExMatch(s,"m)[\{\[""'\r\n]|:\s|,\s|\s#")||RegExMatch(s,"^[\s#\\\-:>]")||RegExMatch(s,"m)\s$")||RegExMatch(s,"m)[\x{7F}-\x{7FFFFFFF}]")
+  else If RegExMatch(s,"m)[\{\[""'\r\n]|:\s|,\s|\s#")||RegExMatch(s,"^[\s#\\\-:>]")||RegExMatch(s,"m)\s$")||RegExMatch(s,"m)[\x{7F}-\x{7FFF}]")
     return ("""" . Yaml_CharUni(s) . """")
   else return s
 }
