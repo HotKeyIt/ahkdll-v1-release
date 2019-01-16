@@ -9,7 +9,7 @@ CryptAES(ByRef lp,sz,pw,e:=1,SID:=256){
 	if e
 		CryptEncrypt(hK,0,1,0,&lp,getvar(sz),sz+16)
 	else
-		CryptDecrypt(hK,0,1,0,&lp,sz)
+		CryptDecrypt(hK,0,1,0,&lp,getvar(sz))
 	CryptDestroyKey(hK),CryptReleaseContext(hP,0)
 	return sz
 }
