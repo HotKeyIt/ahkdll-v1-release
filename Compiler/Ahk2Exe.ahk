@@ -253,10 +253,10 @@ Error_ForceExit := true
 p := []
 Loop, %0%
 {
-	; if %A_Index% = /NoDecompile
-		; Util_Error("Error: /NoDecompile is not supported.")
-	; else 
-	p.Insert(%A_Index%)
+	if %A_Index% = /NoDecompile
+		UseCompression := true ; Util_Error("Error: /NoDecompile is not supported.")
+	else 
+    p.Insert(%A_Index%)
 }
 
 if Mod(p.MaxIndex(), 2)
