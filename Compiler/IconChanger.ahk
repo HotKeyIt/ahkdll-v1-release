@@ -1,9 +1,21 @@
+;
+; File encoding:  UTF-8 with BOM
+;
 
 ; This code is based on Ahk2Exe's changeicon.cpp
 
-ReplaceAhkIcon(re, IcoFile, ExeFile, iconID := 159)
+AddOrReplaceIcon(re, IcoFile, ExeFile, iconID := 0)
 {
-	global _EI_HighestIconID
+	global _CI_HighestIconID, _CIG_HighestIconGroupID
+	
+	CountIcons(ExeFile)
+	
+	if !iconID
+	{
+		CountIconGroups(ExeFile)
+		iconID := ++ _CIG_HighestIconGroupID
+	}
+	
 	ids := EnumIcons(ExeFile, iconID)
 	if !IsObject(ids)
 		return false
@@ -25,13 +37,13 @@ ReplaceAhkIcon(re, IcoFile, ExeFile, iconID := 159)
 	
 	; Delete all the images
 	Loop, % ids.MaxIndex()
-		UpdateResource(re, 3, ids[A_Index], 0x409)
+		DllCall("UpdateResource", "ptr", re, "ptr", 3, "ptr", ids[A_Index], "ushort", 0x409, "ptr", 0, "uint", 0, "uint")
 	
 	Loop, %wCount%
 	{
 		thisID := ids[A_Index]
 		if !thisID
-			thisID := ++ _EI_HighestIconID
+			thisID := ++ _CI_HighestIconID
 		
 		f.RawRead(ige+0, 12) ; read all but the offset
 		NumPut(thisID, ige+12, "UShort")
@@ -53,45 +65,84 @@ ReplaceAhkIcon(re, IcoFile, ExeFile, iconID := 159)
 	return !!DllCall("UpdateResource", "ptr", re, "ptr", 14, "ptr", iconID, "ushort", 0x409, "ptr", &rsrcIconGroup, "uint", rsrcIconGroupSize, "uint")
 }
 
-EnumIcons(ExeFile, iconID)
+CountIcons(ExeFile)
 {
-	; RT_GROUP_ICON = 14
 	; RT_ICON = 3
-	global _EI_HighestIconID
-	static pEnumFunc := RegisterCallback("EnumIcons_Enum")
+	global _CI_HighestIconID
 	
-	hModule := LoadLibraryEx(ExeFile, 0, 2)
+	if _CI_HighestIconID
+		return
+	
+	static pEnumFunc := RegisterCallback("CountIcons_Enum")
+	
+	hModule := DllCall("LoadLibraryEx", "str", ExeFile, "ptr", 0, "ptr", 2, "ptr")
 	if !hModule
 		return
 	
-	_EI_HighestIconID := 0
-	if DllCall("EnumResourceNames","PTR",hModule,"PTR",3,"PTR", pEnumFunc) = 0
-	{
-		FreeLibrary(hModule)
-		return
-	}
+	_CI_HighestIconID := 0
+	DllCall("EnumResourceNames", "ptr", hModule, "ptr", 3, "ptr", pEnumFunc, "uint", 0)
 	
-	hRsrc := DllCall("FindResource", "PTR", hModule, "PTR", iconID, "PTR", 14)
-	,hMem := LoadResource(hModule, hRsrc)
-	,pDirHeader := LockResource(hMem)
-	,pResDir := pDirHeader + 6
+	DllCall("FreeLibrary", "ptr", hModule)
+}
+
+CountIconGroups(ExeFile)
+{
+	; RT_GROUP_ICON = 14
+	global _CIG_HighestIconGroupID
+	
+	if _CIG_HighestIconGroupID
+		return
+	
+	static pEnumFunc := RegisterCallback("CountIconGroups_Enum")
+	
+	hModule := DllCall("LoadLibraryEx", "str", ExeFile, "ptr", 0, "ptr", 2, "ptr")
+	if !hModule
+		return
+	
+	_CIG_HighestIconGroupID := 0
+	DllCall("EnumResourceNames", "ptr", hModule, "ptr", 14, "ptr", pEnumFunc, "uint", 0)
+	
+	DllCall("FreeLibrary", "ptr", hModule)
+}
+
+EnumIcons(ExeFile, iconID)
+{
+	; RT_GROUP_ICON = 14
+	hModule := DllCall("LoadLibraryEx", "str", ExeFile, "ptr", 0, "ptr", 2, "ptr")
+	if !hModule
+		return
+	
+	hRsrc := DllCall("FindResource", "ptr", hModule, "ptr", iconID, "ptr", 14, "ptr")
+	hMem := DllCall("LoadResource", "ptr", hModule, "ptr", hRsrc, "ptr")
+	pDirHeader := DllCall("LockResource", "ptr", hMem, "ptr")
+	pResDir := pDirHeader + 6
 	
 	wCount := NumGet(pDirHeader+4, "UShort")
-	,iconIDs := []
+	iconIDs := []
+	
 	Loop, %wCount%
 	{
 		pResDirEntry := pResDir + (A_Index-1)*14
 		iconIDs[A_Index] := NumGet(pResDirEntry+12, "UShort")
 	}
 	
-	FreeLibrary(hModule)
+	DllCall("FreeLibrary", "ptr", hModule)
 	return iconIDs
 }
 
-EnumIcons_Enum(hModule, type, name, lParam)
+CountIcons_Enum(hModule, type, name, lParam)
 {
-	global _EI_HighestIconID
-	if (name < 0x10000) && name > _EI_HighestIconID
-		_EI_HighestIconID := name
+	global _CI_HighestIconID
+	if (name < 0x10000) && name > _CI_HighestIconID
+		_CI_HighestIconID := name
+	return 1
+}
+
+
+CountIconGroups_Enum(hModule, type, name, lParam)
+{
+	global _CIG_HighestIconGroupID
+	if (name < 0x10000) && name > _CIG_HighestIconGroupID
+		_CIG_HighestIconGroupID := name
 	return 1
 }

@@ -1,3 +1,6 @@
+;
+; File encoding:  UTF-8 with BOM
+;
 
 class VersionRes
 {
@@ -56,10 +59,7 @@ class VersionRes
 	
 	SetText(txt)
 	{
-		if A_IsUnicode
-			this.Data := txt
-		else
-			ObjSetCapacity(this,"Data",StrLen(txt)*2+2),StrPut(txt,this.GetDataAddr(),"UTF-16")
+		this.Data := txt
 		this.IsText := true
 		,this.DataSize := StrLen(txt)+1
 	}
