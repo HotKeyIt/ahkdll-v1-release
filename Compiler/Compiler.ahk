@@ -140,8 +140,8 @@ BundleAhkScript(ExeFile, AhkFile, UseMPRESS, IcoFile="", fileCP="", UseCompressi
         NumPut('UShort', 0, buf.Ptr + totalsz - 1)
         If !BinScriptBody := ZipRawMemory(buf.Ptr,totalsz,'" UsePassword "')
           ExitApp
-        f:=FileOpen(A_AhkDir '\BinScriptBody.bin','w -rwd'),f.RawWrite(BinScriptBody),f.Close()
-      )","BinScriptBody","",A_AhkDir "\AutoHotkeyU.exe")
+        f:=FileOpen(A_AhkDir '\..\BinScriptBody.bin','w -rwd'),f.RawWrite(BinScriptBody),f.Close()
+      )","BinScriptBody","",A_AhkDir "\v2\AutoHotkeyU.exe")
     else
       PID:=DynaRun("
       (
@@ -158,7 +158,7 @@ BundleAhkScript(ExeFile, AhkFile, UseMPRESS, IcoFile="", fileCP="", UseCompressi
           ,DllCall(""crypt32\CryptBinaryToStringA"",""PTR"", &zip,""UInt"", sz,""UInt"", 0x1|0x40000000,""UInt"", 0,""UIntP"", cryptedsz:=0)
           ,tosavesz:=cryptedsz
           ,DllCall(""crypt32\CryptBinaryToStringA"",""PTR"", &zip,""UInt"", sz,""UInt"", 0x1|0x40000000,""PTR"", &buf1,""UIntP"", cryptedsz)
-          ,NumPut(10,&buf1,cryptedsz)
+          ,NumPut(10,&buf1,cryptedsz,""UShort"")
           if (totalsz+tosavesz>bufsz)
             VarSetCapacity(buf,bufsz*=2)
           RtlMoveMemory((&buf) + totalsz,&buf1,tosavesz)
