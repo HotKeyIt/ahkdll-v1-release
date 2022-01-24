@@ -1,0 +1,21 @@
+Class ObjByRef{
+__new(&_1:=unset,&_2:=unset,&_3:=unset,&_4:=unset,&_5:=unset,&_6:=unset,&_7:=unset,&_8:=unset,&_9:=unset,&_10:=unset,&_11:=unset,&_12:=unset,&_13:=unset,&_14:=unset,&_15:=unset,&_16:=unset,&_17:=unset,&_18:=unset,&_19:=unset,&_20:=unset,&_21:=unset,&_22:=unset,&_23:=unset,&_24:=unset,&_25:=unset,&_26:=unset,&_27:=unset,&_28:=unset,&_29:=unset,&_30:=unset,&_31:=unset,&_32:=unset,&_33:=unset,&_34:=unset,&_35:=unset,&_36:=unset,&_37:=unset,&_38:=unset,&_39:=unset,&_40:=unset,&_41:=unset,&_42:=unset,&_43:=unset,&_44:=unset,&_45:=unset,&_46:=unset,&_47:=unset,&_48:=unset,&_49:=unset,&_50:=unset,&_51:=unset,&_52:=unset,&_53:=unset,&_54:=unset,&_55:=unset,&_56:=unset,&_57:=unset,&_58:=unset,&_59:=unset,&_60:=unset,&_61:=unset,&_62:=unset,&_63:=unset,&_64:=unset,&_65:=unset,&_66:=unset,&_67:=unset,&_68:=unset,&_69:=unset,&_70:=unset,&_71:=unset,&_72:=unset,&_73:=unset,&_74:=unset,&_75:=unset,&_76:=unset,&_77:=unset,&_78:=unset,&_79:=unset,&_80:=unset,&_81:=unset,&_82:=unset,&_83:=unset,&_84:=unset,&_85:=unset,&_86:=unset,&_87:=unset,&_88:=unset,&_89:=unset,&_90:=unset,&_91:=unset,&_92:=unset,&_93:=unset,&_94:=unset,&_95:=unset,&_96:=unset,&_97:=unset,&_98:=unset,&_99:=unset,&_100:=unset,&_101:=unset,&_102:=unset,&_103:=unset,&_104:=unset,&_105:=unset,&_106:=unset,&_107:=unset,&_108:=unset,&_109:=unset,&_110:=unset,&_111:=unset,&_112:=unset,&_113:=unset,&_114:=unset,&_115:=unset,&_116:=unset,&_117:=unset,&_118:=unset,&_119:=unset,&_120:=unset,&_121:=unset,&_122:=unset,&_123:=unset,&_124:=unset,&_125:=unset,&_126:=unset,&_127:=unset,&_128:=unset,&_129:=unset,&_130:=unset,&_131:=unset,&_132:=unset,&_133:=unset,&_134:=unset,&_135:=unset,&_136:=unset,&_137:=unset,&_138:=unset,&_139:=unset,&_140:=unset,&_141:=unset,&_142:=unset,&_143:=unset,&_144:=unset,&_145:=unset,&_146:=unset,&_147:=unset,&_148:=unset,&_149:=unset,&_150:=unset,&_151:=unset,&_152:=unset,&_153:=unset,&_154:=unset,&_155:=unset,&_156:=unset,&_157:=unset,&_158:=unset,&_159:=unset,&_160:=unset,&_161:=unset,&_162:=unset,&_163:=unset,&_164:=unset,&_165:=unset,&_166:=unset,&_167:=unset,&_168:=unset,&_169:=unset,&_170:=unset,&_171:=unset,&_172:=unset,&_173:=unset,&_174:=unset,&_175:=unset,&_176:=unset,&_177:=unset,&_178:=unset,&_179:=unset,&_180:=unset,&_181:=unset,&_182:=unset,&_183:=unset,&_184:=unset,&_185:=unset,&_186:=unset,&_187:=unset,&_188:=unset,&_189:=unset,&_190:=unset,&_191:=unset,&_192:=unset,&_193:=unset,&_194:=unset,&_195:=unset,&_196:=unset,&_197:=unset,&_198:=unset,&_199:=unset,&_200:=unset,&_201:=unset,&_202:=unset,&_203:=unset,&_204:=unset,&_205:=unset,&_206:=unset,&_207:=unset,&_208:=unset,&_209:=unset,&_210:=unset,&_211:=unset,&_212:=unset,&_213:=unset,&_214:=unset,&_215:=unset,&_216:=unset,&_217:=unset,&_218:=unset,&_219:=unset,&_220:=unset,&_221:=unset,&_222:=unset,&_223:=unset,&_224:=unset,&_225:=unset,&_226:=unset,&_227:=unset,&_228:=unset,&_229:=unset,&_230:=unset,&_231:=unset,&_232:=unset,&_233:=unset,&_234:=unset,&_235:=unset,&_236:=unset,&_237:=unset,&_238:=unset,&_239:=unset,&_240:=unset,&_241:=unset,&_242:=unset,&_243:=unset,&_244:=unset,&_245:=unset,&_246:=unset,&_247:=unset,&_248:=unset,&_249:=unset,&_250:=unset,&_251:=unset,&_252:=unset,&_253:=unset,&_254:=unset){
+	static _AhkVar:="{Int64 ContentsInt64,Double ContentsDouble,PTR object,PTR mVV},{char *ByteContents,LPTSTR CharContents},{UINT_PTR ByteLength,_AHKVar *AliasFor},UINT_PTR Capacity,BYTE HowAllocated,BYTE Attrib,BYTE Scope,BYTE Type,LPTSTR Name",var:=Struct(_AhkVar)
+while IsSetRef(&_%A_Index%)
+	var[]:=getvar(_%A_Index%),val:=var.AliasFor["",""],this.DefineProp("`a" var.AliasFor["name"],{get : (*)=>val})
+return this
+}
+__GET(key,param){
+local var:=""
+Alias(var,this.%"`a" key%)
+return var
+}
+__SET(key,param,value:=unset){
+static _AhkVar:="{Int64 ContentsInt64,Double ContentsDouble,PTR object,PTR mVV},{char *ByteContents,LPTSTR CharContents},{UINT_PTR ByteLength,_AHKVar *AliasFor},UINT_PTR Capacity,BYTE HowAllocated,BYTE Attrib,BYTE Scope,BYTE Type,LPTSTR Name",var:=Struct("_AhkVar"),val:=""
+local thisvar:=""
+If !this.HasProp("`a" key)
+return (var[]:=value,this.DefineProp("`a" key,{get : (*)=>value}),"")
+Alias(thisvar,this.%"`a" key%)
+return thisvar:=value
+}
+}
